@@ -1,0 +1,11 @@
+/*.sln
+/*.csproj
+/*.vsconfig
+/.vs
+/Library
+/Logs
+/obj
+/Temp
+/UserSettings
+/Assets/Plugins/Sirenix.meta
+/Assets/Plugins/Sirenix
