@@ -3,16 +3,26 @@ using Sirenix.OdinInspector;
 using SubAssets;
 using UnityEngine;
 
-[ShowSubObjectDelete]
-[CreateAssetMenu]
-public class PieceOfData : ScriptableObject
+namespace Root.Game
 {
-	public int id;
+	[ShowSubObjectDelete]
+	[CreateAssetMenu]
+	public class PieceOfData : ScriptableObject
+	{
+		public int id;
 
-	[CreateSubAsset]
-	[InlineEditor]
-	public PieceOfData child;
+		[CreateSubAsset( nameof( GetTrimString ) )]
+		[InlineEditor]
+		public PieceOfData child;
 
-	[SubAssetList( DeleteOnRemove = true, ConfirmDelete = true )]
-	public List<PieceOfData> children = new List<PieceOfData>();
+		[CreateSubAsset( nameof( GetTrimString ) )]
+		[SubAssetList( DeleteOnRemove = true, ConfirmDelete = true, Trim = nameof( GetTrimString ) )]
+		public List<PieceOfData> children = new List<PieceOfData>();
+
+		public IEnumerable<string> GetTrimString()
+		{
+			yield return "Root.";
+			yield return "Game.";
+		}
+	}
 }

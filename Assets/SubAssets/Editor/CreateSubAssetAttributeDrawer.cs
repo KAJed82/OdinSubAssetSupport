@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
+using Sirenix.OdinInspector.Editor.ValueResolvers;
 using Sirenix.Utilities.Editor;
 using UnityEditor;
 using UnityEngine;
@@ -33,6 +34,16 @@ namespace SubAssets.Editor
 			return true;
 		}
 
+		private ValueResolver<IEnumerable<string>> trimResolver;
+
+		protected override void Initialize()
+		{
+			base.Initialize();
+
+			if ( !string.IsNullOrEmpty( Attribute.Trim ) )
+				trimResolver = ValueResolver.Get<IEnumerable<string>>( Property, Attribute.Trim, new string[] { Attribute.Trim } );
+		}
+
 		private List<ValueDropdownItem<Type>> m_NamedValidTypes;
 		private List<ValueDropdownItem<Type>> NamedValidTypes
 		{
@@ -40,13 +51,15 @@ namespace SubAssets.Editor
 			{
 				if ( m_NamedValidTypes == null || m_NamedValidTypes.Count == 0 )
 				{
+					var trims = trimResolver == null ? null : trimResolver.GetValue().ToArray();
+
 					m_NamedValidTypes = SubAssetTypeCache.GetTypes( ValueEntry.BaseValueType )
 					.Select( type =>
 					{
 						var typeName = type.FullName;
-						if ( Attribute.Trim != null )
+						if ( trims != null )
 						{
-							foreach ( var trim in Attribute.Trim )
+							foreach ( var trim in trims )
 								typeName = new Regex( $@"^{trim}|{trim}$" ).Replace( typeName, "" );
 						}
 
@@ -63,6 +76,9 @@ namespace SubAssets.Editor
 
 		protected override void DrawPropertyLayout( GUIContent label )
 		{
+			if ( trimResolver != null )
+				trimResolver.DrawError();
+
 			if ( ValueEntry.SmartValue != null )
 			{
 				CallNextDrawer( label );
@@ -84,9 +100,10 @@ namespace SubAssets.Editor
 			if ( SirenixEditorGUI.IconButton( EditorIcons.File, tooltip: "Create as sub asset" ) )
 			{
 				var typeName = ValueEntry.BaseValueType.Name;
-				if ( Attribute.Trim != null )
+				var trims = trimResolver == null ? null : trimResolver.GetValue().ToArray();
+				if ( trims != null )
 				{
-					foreach ( var trim in Attribute.Trim )
+					foreach ( var trim in trims )
 						typeName = new Regex( $@"^{trim}|{trim}$" ).Replace( typeName, "" );
 				}
 				typeName = ObjectNames.NicifyVariableName( typeName );

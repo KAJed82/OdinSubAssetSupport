@@ -8,6 +8,8 @@
 		public bool DeleteOnRemove { get; set; }
 		public bool ConfirmDelete { get; set; }
 
+		public string Trim { get; set; }
+
 		public SubAssetListAttribute( bool askForName = true, bool enableSingleClick = false )
 		{
 			AskForName = askForName;
