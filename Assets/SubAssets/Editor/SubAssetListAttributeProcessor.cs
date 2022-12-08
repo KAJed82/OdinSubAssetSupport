@@ -37,8 +37,7 @@ namespace SubAssets.Editor
 			if ( listDrawerSettings == null )
 				attributes.Add( listDrawerSettings = new ListDrawerSettingsAttribute() );
 
-			//listDrawerSettings.CustomAddFunction = $"@SubAssets.Editor.SubAssetListHelper.ShowSelector<{typeof( T ).Name}>( $rect, $property, {( subAssetListAttribute.AskForName ? "true" : "false" )}, {( subAssetListAttribute.EnableSingleClick ? "true" : "false" )}, {( string.IsNullOrEmpty( subAssetListAttribute.Trim ) ? "null" : subAssetListAttribute.Trim )} )";
-			listDrawerSettings.CustomAddFunction = $"@SubAssets.Editor.SubAssetListHelper.ShowSelector<{typeof( T ).Name}>( $rect, $property, {( subAssetListAttribute.AskForName ? "true" : "false" )}, {( subAssetListAttribute.EnableSingleClick ? "true" : "false" )}, {( string.IsNullOrEmpty( subAssetListAttribute.Trim ) ? "null" : $"\"{subAssetListAttribute.Trim}\"" )} )";
+			listDrawerSettings.CustomAddFunction = $"@SubAssets.Editor.SubAssetListHelper.ShowSelectorSimple<{typeof( T ).Name}>( $rect, $property, {( subAssetListAttribute.AskForName ? "true" : "false" )}, {( subAssetListAttribute.EnableSingleClick ? "true" : "false" )}, {( subAssetListAttribute.ShowNone ? "true" : "false" )}, {( subAssetListAttribute.AutoCreateIfSingle ? "true" : "false" )}, {( string.IsNullOrEmpty( subAssetListAttribute.Trim ) ? "null" : $"\"{subAssetListAttribute.Trim}\"" )} )";
 
 			if ( subAssetListAttribute.DeleteOnRemove )
 				listDrawerSettings.CustomRemoveIndexFunction = $"@SubAssets.Editor.SubAssetListHelper.RemoveElement<{typeof( TList ).ToGenericTypeString()},{typeof( T ).Name}>( $property, $index, {( subAssetListAttribute.ConfirmDelete ? "true" : "false" )} )";

@@ -43,11 +43,11 @@ namespace SubAssets.Editor
 			} );
 		}
 
-		public static void ShowSelector<T>( Rect rect, InspectorProperty property, bool askForName = true, bool enableSingleClick = false, string trim = null ) where T : ScriptableObject
+		public static void ShowSelectorSimple<T>( Rect rect, InspectorProperty property, bool askForName = true, bool enableSingleClick = false, bool showNone = false, bool createIfSingle = false, string trim = null ) where T : ScriptableObject
 		{
 			if ( string.IsNullOrEmpty( trim ) )
 			{
-				ShowSelector<T>( rect, property, askForName, enableSingleClick, (string[])null );
+				ShowSelector<T>( rect, property, askForName, enableSingleClick, showNone, createIfSingle, ( string[])null );
 			}
 			else
 			{
@@ -55,21 +55,43 @@ namespace SubAssets.Editor
 				if ( trimResolver.HasError )
 				{
 					Debug.LogError( trimResolver.ErrorMessage );
-					ShowSelector<T>( rect, property, askForName, enableSingleClick, (string[])null );
+					ShowSelector<T>( rect, property, askForName, enableSingleClick, showNone, createIfSingle, (string[])null );
 				}
 				else
 				{
-					ShowSelector<T>( rect, property, askForName, enableSingleClick, trimResolver.GetValue().ToArray() );
+					ShowSelector<T>( rect, property, askForName, enableSingleClick, showNone, createIfSingle, trimResolver.GetValue().ToArray() );
 				}
 			}
 		}
 
-		public static void ShowSelector<T>( Rect rect, InspectorProperty property, bool askForName = true, bool enableSingleClick = false, params string[] trims ) where T : ScriptableObject
+		public static void ShowSelector<T>( Rect rect, InspectorProperty property, bool askForName = true, bool enableSingleClick = false, bool showNone = false, bool createIfSingle = false, params string[] trims ) where T : ScriptableObject
 		{
-			var gs = new GenericSelector<ValueDropdownItem<Type>>(
-				GetNamedValidTypes( typeof( T ), trims )
-				.Prepend( new ValueDropdownItem<Type>( "None", null ) )
-			);
+			//ShowNone
+			var items = GetNamedValidTypes( typeof( T ), trims ).ToList();
+
+			if ( createIfSingle )
+			{
+				if ( items.Count == 0 ) // Add empty
+				{
+					AddToAsset( null, null, property );
+					return;
+				}
+				else if ( items.Count == 1 ) // Add only option
+				{
+					var type = items[0].Value;
+					if ( askForName )
+						EditorApplication.delayCall += () => Rename( type, property );
+					else
+						AddToAsset( $"New {type.Name}", type, property );
+
+					return;
+				}
+			}
+
+			if ( showNone )
+				items.Insert( 0, new ValueDropdownItem<Type>( "None", null ) );
+
+			var gs = new GenericSelector<ValueDropdownItem<Type>>( items );
 			if ( enableSingleClick )
 				gs.EnableSingleClickToSelect();
 

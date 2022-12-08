@@ -33,6 +33,9 @@ namespace SubAssets.Editor
 				"deleteSubObject",
 				() =>
 				{
+					if ( !EditorUtility.DisplayDialog( "Delete", "Delete sub object?", "Ok", "Cancel" ) )
+						return;
+
 					for ( int i = 0; i < Property.ValueEntry.ValueCount; ++i )
 					{
 						T asset = Property.ValueEntry.WeakValues[i] as T;

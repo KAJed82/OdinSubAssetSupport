@@ -8,6 +8,10 @@
 		public bool DeleteOnRemove { get; set; }
 		public bool ConfirmDelete { get; set; }
 
+		public bool ShowNone { get; set; }
+		public bool AutoCreateIfSingle { get; set; }
+
+
 		public string Trim { get; set; }
 
 		public SubAssetListAttribute( bool askForName = true, bool enableSingleClick = false )
